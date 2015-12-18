@@ -740,6 +740,25 @@ public final class BitmapContainer extends Container implements Cloneable {
         }
         return answer;
     }
+    
+    @Override
+    public int orCardinality(final ArrayContainer value2) {
+        int cardinality = 0;
+        int c = value2.cardinality;
+        for (int k = 0; k < c ; ++k) {
+            short v = value2.content[k];
+            final int i = Util.toIntUnsigned(v) >>> 6;
+            long w = this.bitmap[i];
+            long aft = w | (1l << v);
+            if (USE_BRANCHLESS) {
+                cardinality += (w - aft) >>> 63;
+            } else {
+                if (w != aft)
+                    cardinality++;
+            }
+        }
+        return cardinality;
+    }
 
     @Override
     public Container or(final BitmapContainer value2) {
@@ -757,6 +776,16 @@ public final class BitmapContainer extends Container implements Cloneable {
         return answer;
     }
 
+    @Override
+    public int orCardinality(final BitmapContainer value2) {
+        cardinality = 0;
+        for (int k = 0; k < value2.bitmap.length; ++k) {
+            long w = this.bitmap[k] | value2.bitmap[k];
+            cardinality += Long.bitCount(w);
+        }
+        return cardinality;
+    }
+    
     @Override
     public void readExternal(ObjectInput in) throws IOException,
             ClassNotFoundException {
@@ -1172,6 +1201,11 @@ public final class BitmapContainer extends Container implements Cloneable {
     @Override
     public Container or(RunContainer x) {
         return x.or(this);
+    }
+
+    @Override
+    public int orCardinality(RunContainer x) {
+        return x.orCardinality(this);
     }
 
     @Override

@@ -646,6 +646,61 @@ public final class Util {
         //return pos;
     }
     
+    /**
+    * count the set bits in the union of two sorted lists
+    *
+    * @param set1    first array
+    * @param length1 length of first array
+    * @param set2    second array
+    * @param length2 length of second array
+    * @return cardinality of the union
+    */
+   public static int unsignedUnion2by2Cardinality(final short[] set1,
+                                       final int length1, final short[] set2, final int length2) {
+       int pos = 0;
+       int k1 = 0, k2 = 0;
+       if (0 == length2) {
+           return length1;
+       }
+       if (0 == length1) {
+           return length2;
+       }
+       short s1 = set1[k1];
+       short s2 = set2[k2];
+       while (true) {
+           int v1 = toIntUnsigned(s1);
+           int v2 = toIntUnsigned(s2);
+           if (v1 < v2) {
+               pos++;
+               ++k1;
+               if (k1 >= length1) {
+                   return pos + length2 - k2;
+               }
+               s1 = set1[k1];
+           } else if (v1 == v2) {
+               pos++;
+               ++k1;
+               ++k2;
+               if (k1 >= length1) {
+                   return pos + length2 - k2;
+               }
+               if (k2 >= length2) {
+                   return pos + length1 - k1;
+               }
+               s1 = set1[k1];
+               s2 = set2[k2];
+           } else {// if (set1[k1]>set2[k2])
+               pos++;
+               ++k2;
+               if (k2 >= length2) {
+                   return pos + length1 - k1;
+               }
+               s2 = set2[k2];
+           }
+       }
+       //return pos;
+   }
+    
     
     
     

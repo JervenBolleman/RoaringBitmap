@@ -123,6 +123,7 @@ public abstract class Container implements Iterable<Short>, Cloneable, Externali
     public abstract int andCardinality(ArrayContainer x);
     public abstract int andCardinality(BitmapContainer x);
     public abstract int andCardinality(RunContainer x);
+    
     /**
      * Computes the bitwise ANDNOT of this container with another
      * (difference). This container as well as the provided container are
@@ -622,7 +623,24 @@ public abstract class Container implements Iterable<Short>, Cloneable, Externali
             return or((BitmapContainer) x);
         return or((RunContainer) x);
     }
-
+    
+    /**
+     * Computes the cardinality of the bitwise OR of this container with another (union). This
+     * container as well as the provided container are left unaffected.
+     *
+     * @param x other container
+     * @return cardinality of the aggregated container
+     */
+    public int orCardinality(Container x) {
+        if (x instanceof ArrayContainer)
+            return orCardinality((ArrayContainer) x);
+        else if (x instanceof BitmapContainer)
+            return orCardinality((BitmapContainer) x);
+        return orCardinality((RunContainer) x);
+    }
+    public abstract int orCardinality(ArrayContainer x);
+    public abstract int orCardinality(BitmapContainer x);
+    public abstract int orCardinality(RunContainer x);
     /**
      * Remove the short from this container. May create a new container.
      *

@@ -536,12 +536,24 @@ public final class ArrayContainer extends Container implements Cloneable {
                 value2.getCardinality(), answer.content);
         return answer;
     }
+    
+    @Override
+    public int orCardinality(final ArrayContainer value2) {
+        final ArrayContainer value1 = this;
+        return Util.unsignedUnion2by2Cardinality(value1.content,
+                value1.getCardinality(), value2.content,
+                value2.getCardinality());
+    }
 
     @Override
     public Container or(BitmapContainer x) {
         return x.or(this);
     }
 
+    @Override
+    public int orCardinality(BitmapContainer x) {
+        return x.orCardinality(this);
+    }
    
     private int advance(ShortIterator it) {
         if (it.hasNext()) 
@@ -959,6 +971,11 @@ public final class ArrayContainer extends Container implements Cloneable {
         return x.or(this);
     }
 
+    @Override
+    public int orCardinality(RunContainer x) {
+        return x.orCardinality(this);
+    }
+    
     @Override
     public Container xor(RunContainer x) {
         return x.xor(this);

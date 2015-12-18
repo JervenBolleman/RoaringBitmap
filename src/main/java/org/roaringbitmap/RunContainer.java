@@ -877,6 +877,12 @@ public final class RunContainer extends Container implements Cloneable {
         return lazyor(x).repairAfterLazy();
     }
     
+    @Override
+    public int orCardinality(ArrayContainer x) {
+        // we guess that, often, the result will still be efficiently expressed as a run container
+        return lazyor(x).repairAfterLazy().getCardinality();
+    }
+    
     protected Container ilazyor(ArrayContainer x) {
         if(isFull()) return this; // this can sometimes solve a lot of computation!
         return ilazyorToRun(x);
@@ -1011,6 +1017,21 @@ public final class RunContainer extends Container implements Cloneable {
         }
         answer.computeCardinality();
         return answer;
+    }
+    
+    @Override
+    public int orCardinality(BitmapContainer x) {
+        if(isFull()) return getCardinality();
+        // could be implemented as  return toTemporaryBitmap().ior(x);
+        //TODO this allocates
+        BitmapContainer answer = x.clone();
+        for(int rlepos = 0; rlepos < this.nbrruns; ++rlepos ) {
+            int start = Util.toIntUnsigned(this.getValue(rlepos));
+            int end = start + Util.toIntUnsigned(this.getLength(rlepos)) + 1;
+            Util.setBitmapRange(answer.bitmap, start, end);
+        }
+        answer.computeCardinality();
+        return answer.getCardinality();
     }
     
     @Override
@@ -2073,6 +2094,37 @@ public final class RunContainer extends Container implements Cloneable {
         }
 
         return answer.toBitmapIfNeeded();
+    }
+    
+    @Override
+    public int orCardinality(RunContainer x) {
+        if(isFull()) return getCardinality();
+        if(x.isFull()) return x.getCardinality(); // cheap case that can save a lot of computation
+        // we really ought to optimize the rest of the code for the frequent case where there is a single run
+        RunContainer answer = new RunContainer(new short[2 * (this.nbrruns + x.nbrruns)],0);
+        //TODO this allocates
+        int rlepos = 0;
+        int xrlepos = 0;
+
+        while ((xrlepos < x.nbrruns) && (rlepos < this.nbrruns)) {
+            if(Util.compareUnsigned(getValue(rlepos), x.getValue(xrlepos)) <= 0) {
+                answer.smartAppend(getValue(rlepos), getLength(rlepos));
+                rlepos++;
+            } else {
+                answer.smartAppend(x.getValue(xrlepos), x.getLength(xrlepos));
+                xrlepos++;
+            }
+        }
+        while (xrlepos < x.nbrruns) {
+            answer.smartAppend(x.getValue(xrlepos), x.getLength(xrlepos));
+            xrlepos++;
+        }
+        while (rlepos < this.nbrruns) {
+            answer.smartAppend(getValue(rlepos), getLength(rlepos));
+            rlepos++;
+        }
+
+        return answer.getCardinality();
     }
 
 
