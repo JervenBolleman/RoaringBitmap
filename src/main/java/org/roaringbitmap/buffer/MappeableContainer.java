@@ -87,6 +87,38 @@ public abstract class MappeableContainer implements Iterable<Short>, Cloneable,
 
     public abstract MappeableContainer and(MappeableRunContainer x);
 
+    /**
+     * Computes the bitwise AND cardinality of this container with another (intersection).
+     * This container as well as the provided container are left unaffected.
+     * 
+     * @param x
+     *            other container
+     * @return aggregated container cardinality count
+     */
+
+    public abstract int andCardinality(MappeableRunContainer x);
+    
+    /**
+     * Computes the bitwise AND cardinality of this container with another (intersection).
+     * This container as well as the provided container are left unaffected.
+     * 
+     * @param x
+     *            other container
+     * @return aggregated container cardinality count
+     */
+
+    public abstract int andCardinality(MappeableBitmapContainer x);
+    
+    /**
+     * Computes the bitwise AND cardinality of this container with another (intersection).
+     * This container as well as the provided container are left unaffected.
+     * 
+     * @param x
+     *            other container
+     * @return aggregated container cardinality count
+     */
+
+    public abstract int andCardinality(MappeableArrayContainer x);
 
     protected MappeableContainer and(MappeableContainer x) {
         if (x instanceof MappeableArrayContainer)
@@ -94,6 +126,15 @@ public abstract class MappeableContainer implements Iterable<Short>, Cloneable,
         else if ( x instanceof MappeableRunContainer)
             return and((MappeableRunContainer) x);
         return and((MappeableBitmapContainer) x);
+
+    }
+    
+    protected int andCardinality(MappeableContainer x) {
+        if (x instanceof MappeableArrayContainer)
+            return andCardinality((MappeableArrayContainer) x);
+        else if ( x instanceof MappeableRunContainer)
+            return andCardinality((MappeableRunContainer) x);
+        return andCardinality((MappeableBitmapContainer) x);
 
     }
 

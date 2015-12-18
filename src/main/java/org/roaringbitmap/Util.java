@@ -493,7 +493,7 @@ public final class Util {
         return pos;
     }
     
-    protected static int unsignedLocalIntersect2by2Cardinality(final short[] set1, final int length1,
+    public static int unsignedLocalIntersect2by2Cardinality(final short[] set1, final int length1,
             final short[] set2, final int length2) {
         if ((0 == length1) || (0 == length2))
             return 0;

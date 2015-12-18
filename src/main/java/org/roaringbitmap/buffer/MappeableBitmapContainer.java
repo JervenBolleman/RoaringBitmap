@@ -341,7 +341,56 @@ public final class MappeableBitmapContainer extends MappeableContainer
         return value2.and(this);
     }
 
+    @Override
+    public int andCardinality(final MappeableArrayContainer value2) {
 
+        int cardinality = 0;
+        if (BufferUtil.isBackedBySimpleArray(value2.content)) {
+            short[] c = value2.content.array();
+            int ca = value2.cardinality;
+            for (int k = 0; k < ca; ++k) {
+                short v = c[k];
+                if (this.contains(v))
+                    cardinality++;
+            }
+
+        } else {
+            int ca = value2.cardinality;
+            for (int k = 0; k < ca; ++k) {
+                short v = value2.content.get(k);
+                if (this.contains(v))
+                    cardinality++;
+            }
+        }
+        return cardinality;
+    }
+
+    @Override
+    public int andCardinality(final MappeableBitmapContainer value2) {
+        int newCardinality = 0;
+        if (BufferUtil.isBackedBySimpleArray(this.bitmap) && BufferUtil.isBackedBySimpleArray(value2.bitmap)) {
+            long[] tb = this.bitmap.array();
+            long[] v2b = value2.bitmap.array();
+            int len = this.bitmap.limit();
+            for (int k = 0; k < len; ++k) {
+                newCardinality += Long.bitCount(tb[k] & v2b[k]);
+            }
+        } else {
+            int len = this.bitmap.limit();
+            for (int k = 0; k < len; ++k) {
+                newCardinality += Long.bitCount(this.bitmap.get(k)
+                        & value2.bitmap.get(k));
+            }
+        }
+        return newCardinality;
+    }
+
+
+   
+    @Override
+    public int andCardinality(final MappeableRunContainer value2) {
+        return value2.andCardinality(this);
+    }
 
     @Override
     public MappeableContainer andNot(final MappeableArrayContainer value2) {
